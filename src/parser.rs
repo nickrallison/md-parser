@@ -7,7 +7,7 @@ use pest_derive::Parser;
 /*
 Grammar:
 #####
-string_char = _{ (ASCII_ALPHANUMERIC | "-" | "_" | "'" | "\"" | "\\*" | " " | "\t" | "," | "." | "!" | "?" | "(" | ")" ) }
+string_char = _{ (ASCII_ALPHANUMERIC | (!('\u{00}'..'\u{7F}') ~ ANY) | "-" | "–" | "_" | "'" | "\"" | "\\*" | "\\[" | "\\]" | " " | "\t" | "," | "." | "!" | "?" | "(" | ")" | "+" | "=" | ";" | ":" | "/" | "%" | "^" | "{" | "}" | "|" | "\\" | ">" | "<" ) }
 
 filepath = { (!"$" ~ !"*" ~ !"\n" ~ !"[" ~ !"]" ~ !">" ~ ANY)+ }
 
@@ -20,6 +20,7 @@ italic_node = { "*" ~ ( named_link_node | latex_inline_node | link_node | weblin
 named_link_node = { "["{2} ~ filepath ~ "|" ~ node+ ~ "]"{2} }
 link_node = { "["{2} ~ filepath ~ "]"{2} }
 weblink_node = { "[" ~ weblink_text ~ "]" ~ "(" ~ weblink_link ~ ")"}
+square_bracket_node = { "[" ~ (!"]" ~ ANY)+ ~ "]" }
 latex_inline_node = { "$" ~ (!"$" ~ ANY)+ ~ "$" }
 code_inline_node = { "`" ~ (!"`" ~ ANY)+ ~ "`" }
 node = { string_char+ }
@@ -27,7 +28,7 @@ node = { string_char+ }
 heading_line = { "#"{1,6} ~ " " ~ string_line }
 numbered_list_line = { (" " | "\r" | "\t")* ~ ASCII_DIGIT+ ~ "." ~ (" " | "\r" | "\t")+ ~ string_line}
 list_line = { (" " | "\r" | "\t")* ~ "-" ~ (" " | "\r" | "\t")* ~ string_line}
-string_line = { (bold_italic_node | bold_node | italic_node | named_link_node | link_node | weblink_node | latex_inline_node | code_inline_node | node)* }
+string_line = { (bold_italic_node | bold_node | italic_node | named_link_node | link_node | weblink_node | square_bracket_node | latex_inline_node | code_inline_node | node)* }
 
 line = { (heading_line | numbered_list_line | list_line | string_line ) }
 block_quote_line = { ((" " | "\r" | "\t")* ~ ">" ~ (block_quote_line | line)) }
@@ -483,6 +484,10 @@ fn parse_string_line(pair: pest::iterators::Pair<Rule>) -> StringLine {
 			Rule::weblink_node => {
 				nodes.push(Node::WebLink(parse_weblink_node(pair_inner)));
 			}
+			Rule::square_bracket_node => {
+				nodes.push(Node::SquareBracket(pair_inner.as_str().to_string())
+				);
+			}
 			Rule::latex_inline_node => {
 				nodes.push(Node::InlineLatex(pair_inner.as_str().to_string()));
 			}
@@ -509,6 +514,7 @@ enum Node {
 	MDLink(String),
 	NamedMDLink(NamedMDLink),
 	WebLink(WebLink),
+	SquareBracket(String),
 	InlineCode(String),
 	InlineLatex(String),
 }
