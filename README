@@ -1,0 +1,41 @@
+# Important
+
+## Escape Characters
+The follow characters have to be escaped when used in normal text sections:
+- "*"
+- "["
+- "]"
+- "$"
+
+## Code Blocks
+Code Blocks and Latex blocks must start with a new line and end with a new line.
+Whitespaces at the beginning of a line cause parsing to fail
+
+Bad:
+         ```c
+#include <stdio.h>
+#include <stdlib.h>
+         ```
+Good
+```c
+#include <stdio.h>
+#include <stdlib.h>
+```
+
+## Termination
+
+Special characters must be terminated.
+
+Good:
+This is **Impotant** text
+
+Bad:
+This is **Impotant text
+
+Good:
+This is a [[link]] to a page
+
+Bad:
+This is a [[link to a page
+This is a link]] to a page
+

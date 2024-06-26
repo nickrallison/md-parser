@@ -11,8 +11,8 @@ fn main() {
 	for file in filelist {
 		let file: DirEntry = file.unwrap();
 		let path: PathBuf = file.path();
-		let content: String = fs::read_to_string(&path).unwrap() + " \n";
 		println!("##############\nParsing: {}", path.display());
+		let content: String = fs::read_to_string(&path).unwrap() + " \n";
 		let parsed: MDFile = parse_md_file_wrapper(content);
 		// println!("{:?}", parsed);
 	}

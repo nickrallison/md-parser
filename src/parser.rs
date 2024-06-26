@@ -488,6 +488,12 @@ fn parse_string_line(pair: pest::iterators::Pair<Rule>) -> StringLine {
 				nodes.push(Node::SquareBracket(pair_inner.as_str().to_string())
 				);
 			}
+			Rule::latex_block_inline_node => {
+				nodes.push(Node::InlineLatexBlock(pair_inner.as_str().to_string()));
+			}
+			Rule::code_block_inline_node => {
+				nodes.push(Node::InlineCodeBlock(pair_inner.as_str().to_string()));
+			}
 			Rule::latex_inline_node => {
 				nodes.push(Node::InlineLatex(pair_inner.as_str().to_string()));
 			}
@@ -517,6 +523,8 @@ enum Node {
 	SquareBracket(String),
 	InlineCode(String),
 	InlineLatex(String),
+	InlineCodeBlock(String),
+	InlineLatexBlock(String),
 }
 
 #[derive(Debug)]
